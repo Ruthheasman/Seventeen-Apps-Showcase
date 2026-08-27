@@ -1,44 +1,60 @@
-# [Project name]
+# Seventeen Apps — Ruth Heasman
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A static, single-page brochure showcase for Ruth Heasman's seventeen BSV-focused apps. Visitors land on a full-viewport hero with a draggable 3D fan carousel of all seventeen app cards, then scroll through one generous panel per app. Every app links out to the live product in a new tab.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- Preview runs from the managed workflow `artifacts/seventeen-apps: web` — do not run `pnpm dev` at the repo root
 - `pnpm run typecheck` — full typecheck across all packages
+- `pnpm --filter @workspace/seventeen-apps run typecheck` — typecheck just the site
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/scripts run fetch-app-previews` — refresh app preview images from each app's live Open Graph tags
+- No environment variables or secrets are required
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Site: React 18 + Vite + Tailwind v4, `wouter` for routing
+- No backend, no database, no auth — the site is fully static
+
+The workspace also ships an unused Express API server, Drizzle/Postgres lib, and OpenAPI codegen from the monorepo template. This project does not use them.
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/seventeen-apps/` — the site (the only artifact that matters here), served at `/`
+- `artifacts/seventeen-apps/src/data/apps.ts` — **source of truth for all app content.** The ordered list of seventeen apps with name, description, URL and image path, plus `appImageUrl()` for resolving image paths against the Vite base URL
+- `artifacts/seventeen-apps/public/apps/` — the seventeen app preview images
+- `artifacts/seventeen-apps/src/index.css` — theme tokens and palette
+- `scripts/src/fetch-app-previews.mjs` — refreshes preview images from live Open Graph tags
+- `attached_assets/Pasted-Thursday-17-Apps-Prompt-*.txt` — the original written design specification for this page
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- **App content is data, not markup.** Names, descriptions and URLs were supplied exactly and must not be inferred from repository metadata or rewritten. Everything reads from `src/data/apps.ts` so there is one place to correct.
+- **Preview images are real, never generated.** Eleven come from each app's live Open Graph image; six apps publish no usable `og:image` and were captured with a live screenshot instead. Re-running the fetch script only refreshes the Open Graph ones — it reports the other six as MISS and leaves the captures alone.
+- **Carousel state is one number.** Every card's position, depth, rotation, scale, opacity, blur and z-index derives from a single fractional carousel position clamped 0–16. There are no independent per-card positions.
+- **Transforms run through `requestAnimationFrame`, not layout animation.** CSS transitions are reserved for deliberate settling, tab reveals, arrow movement and panel reveals.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Full-viewport hero with the headline and a wide, shallow circular fan of all seventeen app cards, draggable by pointer, trackpad, or arrow keys, with momentum and a settle to the nearest card
+- Clicking a card brings it to centre and expands it; clicking again returns it to the fan
+- Each card carries its app number, title, description and a real `Open app` anchor that opens in a new tab without toggling the card's focus state
+- One near-full-viewport panel per app below the carousel, in three rotating layouts, revealed on scroll
+- Keyboard accessible throughout, with a visible vermilion focus treatment, and a static readable fallback under `prefers-reduced-motion`
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Self-host font files rather than loading from third-party font CDNs; system stacks are preferred over a CDN
+- App names, descriptions and URLs are fixed — do not reword them
+- No generated or decorative artwork on this page; the app screenshots are the only strongly coloured elements
+- No emojis in the UI
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Preview image paths must be resolved with `appImageUrl()`. A bare root-relative path like `/apps/foo.jpg` escapes the artifact's base path and breaks when the site is not served at the root.
+- The app screenshots are mixed aspect ratios and mostly landscape. Carousel crops anchor to the left/top rather than centring, at every breakpoint.
+- `pnpm --filter @workspace/seventeen-apps run build` needs `PORT` and `BASE_PATH` from the workflow, so it can fail from a bare shell even when the code is fine. Use `typecheck` to verify from the shell.
 
 ## Pointers
 

@@ -1,0 +1,279 @@
+Thursday “17 Apps” Prompt
+
+# Ruth Heasman — Apple Restraint Showcase Prompt
+
+Build a static, single-page showcase for Ruth Heasman's exact 17 BSV-focused
+apps. This is a separate Apple-inspired mockup direction; keep the original
+production showcase intact.
+
+There is no backend, authentication, database, form, or CMS. The page is a
+visual portfolio and every app link opens in a new tab.
+
+## Overall direction
+
+Use Apple product-page restraint: calm, spacious, precise, centred
+compositions, generous whitespace, soft depth, and slow deliberate motion.
+The result should feel like a premium interactive product page rather than a
+brutalist poster, print artefact, or conventional portfolio grid.
+
+Avoid:
+
+- heavy display weights
+- heavy borders and visible dividers outside the card treatment
+- monospace labels or decorative UI chrome
+- decorative gradients, glassmorphism, or background colour drift
+- rotated or cropped hero typography
+- decorative illustrations or generated artwork
+- excessive UI chrome
+
+The app screenshots are the only strongly coloured visual elements on the
+page.
+
+## Colour and type
+
+Use a warm bone background throughout, approximately `#F2EFE9`, with near-black
+text around `#111111`. Use a restrained muted grey for secondary type, around
+`#777777` to `#B8B8B8`. Vermilion, around `#E2543B`, is the only accent and
+should be used sparingly for quiet links, focus states, and small interactive
+details.
+
+Use a refined system serif stack for the hero, panel headings, and closing
+statement. Use a clean sans-serif stack for the navigation, card titles,
+descriptions, and links. Self-host font files when custom fonts are used;
+otherwise prefer reliable system stacks over third-party font CDNs.
+
+## Section 1 — hero and carousel
+
+Create a full-viewport hero. Place a small, quiet header at the top with:
+
+- `Ruth Heasman` on the left
+- `Seventeen apps` on the right
+
+Centre the hero headline above the carousel:
+
+```text
+Seventeen apps.
+Every one takes satoshis.
+```
+
+The first line is near-black. The second line is much larger and muted grey.
+Use large editorial serif typography, but keep the composition calm and
+spacious. Beneath the headline, add the quiet instruction:
+
+```text
+Drag, scroll, or use the arrow keys.
+```
+
+### Fan composition
+
+Arrange all 17 app cards on a wide, shallow circular fan across the lower half
+of the viewport. The cards should read as large portrait playing cards laid on
+a curved surface receding into depth.
+
+Cards should:
+
+- use compact portrait proportions rather than oversized full-page cards
+- share a single centred origin
+- arc from left to right with subtle rotation
+- use large rounded corners, a restrained 1–2px coloured edge, and soft diffuse shadows
+- show the app screenshot in a reduced upper image window, not behind the entire card
+- fit the screenshot into the reduced window; when the source is wider than the
+  card, anchor its crop to the left/top rather than centring it
+- use a layered lower tab panel that overlaps the image window
+- use a dark indigo, pale blue, or deep charcoal tab surface in rotation
+- place a large two-digit app number at the top-left of the tab and a small
+  diagonal arrow at the top-right
+- use a clean sans-serif app title inside the tab
+- fade and clip through the bottom of the carousel viewport
+
+The bottom of the fan must use a CSS transparency mask. The lower card halves
+should not end with a hard rectangular edge; they should dissolve into the
+bone background.
+
+The focused card sits at the front of the fan. Cards farther from the centre
+become progressively smaller, more transparent, more blurred, and farther
+back in 3D space.
+
+### Tabbed card treatment and animation
+
+The new card layout is inspired by a tactile folder or index-card tab:
+
+- the screenshot occupies roughly the upper 60–65% of the compact card
+- the lower content panel rises over the screenshot with a rounded top edge
+- add a small protruding rounded tab shape at the panel's top-left corner
+- the tab should feel like one connected surface, not a floating tooltip
+- keep the focused card's image and tab visually crisp while distant cards
+  inherit the carousel's reduced scale, opacity, blur, and depth
+
+The tab is animated rather than static:
+
+- in its resting state, the tab sits slightly low and keeps the description
+  visually quiet
+- on hover, keyboard focus, or card expansion, the tab slides upward and
+  grows taller
+- the description reveals with a short fade-and-rise transition
+- the arrow nudges diagonally on hover/focus
+- the animation should feel soft and physical, not like a menu opening
+- the tab must remain readable and stable while the card is being dragged
+
+Inside the tab, show the app number, title, one-line description, and a quiet
+text action. Directly beneath the title, add:
+
+```text
+Open app
+```
+
+This must be a real anchor, open the relevant app in a new tab, and remain
+visually subordinate to the title. The small diagonal arrow can also be a
+real, separately keyboard-accessible anchor to the same URL. Clicking either
+link must not toggle the card focus state.
+
+### Carousel interaction
+
+Use one fractional carousel position, clamped from `0` to `16`. Derive every
+card's position, depth, rotation, scale, opacity, blur, and z-index from that
+single value. Do not maintain independent per-card positions.
+
+Support:
+
+- horizontal pointer dragging
+- trackpad or mouse-wheel horizontal scrolling
+- left and right arrow keys
+- momentum after drag release
+- a gentle settle to the nearest card after motion stops
+- clicking any card to bring it to the centre
+
+Card expansion behavior:
+
+- Clicking a card once pulls that card forward and makes it larger.
+- The expanded card lifts slightly, receives extra positive `translateZ`,
+  reduced blur, and a higher stacking order.
+- Clicking the same card again returns it to the normal fan state.
+- Clicking a different card transfers the expanded state to that card and
+  brings it to the centre.
+- The separate `Open app` link opens the app and does not expand or collapse
+  the card.
+
+The interaction should feel physical and continuous. Do not hard-snap during
+dragging. Use `requestAnimationFrame` for transform updates and avoid layout
+animation. Use CSS transitions only for deliberate settling, tab reveals,
+arrow movement, or panel reveals.
+
+The focused and expanded states must be accessible:
+
+- make each card keyboard-focusable
+- expose the card as a button-like control
+- provide an accessible label such as `Focus BrandCaster`
+- expose the expanded state with `aria-pressed`
+- support Enter and Space for card expansion
+- provide a visible vermilion `:focus-visible` treatment
+- keep the `Open app` anchor separately keyboard-accessible
+
+## Section 2 — app panels
+
+After the carousel, show one generous panel for each app in the same order as
+the cards. Each panel should occupy close to a full viewport with generous
+vertical padding.
+
+Use three layouts in rotation:
+
+- **A:** screenshot centred and floating, app name above, description below
+- **B:** screenshot on the right, type on the left
+- **C:** screenshot on the left, type on the right
+
+Use layout A for every third panel. Keep the panels separate; they should not
+overlap or stack.
+
+Each panel includes:
+
+- app name
+- one-line description
+- a quiet vermilion `Open app` link with a chevron
+- the app preview image
+
+Panels should fade and rise gently by roughly 24px as they enter the viewport.
+Use `IntersectionObserver` or an equivalent viewport-aware reveal.
+
+## Section 3 — close
+
+End with generous whitespace and a centred closing statement:
+
+```text
+Ruth Heasman
+```
+
+Place this small grey line beneath it:
+
+```text
+Built on Replit. Paid in satoshis.
+```
+
+## Exact app content
+
+Use this list exactly. Do not infer names, descriptions, or URLs from
+repository metadata.
+
+1. **1Satchel** — `https://1satchel.com` — Every link can charge for itself
+2. **Permastack** — `https://permastackpress.com` — Publish forever on BSV
+3. **MintPage** — `https://mintpage.pro` — Design and deploy on BSV
+4. **SonicStar** — `https://sonicstar.net` — Mint your music on the blockchain
+5. **BSV Patent Forge** — `https://bsvpatentforge.com` — Turn the nChain and
+   Teranode patent vault into buildable opportunities
+6. **Wonkerly** — `https://wonkerly.com` — Personalised nonsense verses for the
+   people you tolerate
+7. **BrandCaster** — `https://brandcaster.studio` — AI-generated brand bibles
+   in minutes
+8. **VibeGlowUp** — `https://vibeglowup.com` — AI-powered virtual try-on
+9. **Rapid Reader** — `https://rapidreader.net` — Read faster, comprehend more
+10. **StartupScout** — `https://startupscout.co` — AI-powered startup analysis
+11. **Number Cruncher 3D** — `https://numbercrunchermath.com` — Solve 3D maths
+    puzzles
+12. **The AI-Bitcoin Revolution** — `https://aibitcoinrevolution.com` —
+    Building tomorrow's trust infrastructure
+13. **BSV Halloween Memory Game** —
+    `https://bsv-halloween-snap-game.replit.app` — Women of BSV Halloween NFTs
+    in memory game form
+14. **AI Chef** —
+    `https://ai-chef-assistant--ruthheasman.replit.app` — Turn grocery lists
+    into dinner ideas
+15. **Terapong** — `https://terapong-game.replit.app` — Nano-payment arcade game
+16. **VeriHalo** — `https://veri-halo.replit.app/web/` — Patient-owned,
+    blockchain-verified health records
+17. **Quiz Battle Live** — `https://quiz-battle-live.replit.app` — Real-time BSV
+    trivia battles
+
+## Images
+
+Use each app's live Open Graph or social preview image where it is reliable.
+Use local supplied screenshots or local captures for missing, broken, or
+unreliable sources. Do not generate decorative replacement artwork.
+
+Carousel images should be lazy-loaded below the fold, with only the first
+visible images eager-loaded. Every image needs an empty alt attribute when the
+adjacent card title already identifies the app.
+
+## Responsive and reduced-motion behavior
+
+Optimise first for a large desktop display, then provide a deliberate mobile
+layout:
+
+- keep the hero headline readable without horizontal overflow
+- reduce card width, image-window height, and fan radius on small screens
+- preserve the centred focused-card experience
+- keep the tab number, title, description reveal, and `Open app` link visible
+  and tappable
+- keep carousel screenshots anchored to the left/top edge at every breakpoint
+- allow vertical page scrolling while horizontal carousel gestures remain
+  intentional
+
+Respect `prefers-reduced-motion`. Disable momentum, fan animation, panel
+transitions, and smooth scrolling when reduced motion is requested. Show a
+static, readable card arrangement and fully visible panels instead.
+
+## Final quality bar
+
+The finished page should feel quiet, tactile, and premium. The carousel is the
+primary interaction: it must be immediately understandable, visually balanced,
+keyboard-accessible, and reliable when a user clicks a card once to expand it
+and again to return it to the fan. The app links must remain obvious enough to
+use without competing with the card composition.

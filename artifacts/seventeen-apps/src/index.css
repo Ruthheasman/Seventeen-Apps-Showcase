@@ -1,0 +1,271 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+  --color-accent: hsl(var(--accent));
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+:root {
+  --background: 40 23% 93%; /* #F2EFE9 */
+  --foreground: 0 0% 7%;    /* #111111 */
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 60%; /* #999999 */
+  --border: 0 0% 85%;
+  --accent: 9 74% 56%;      /* #E2543B */
+  
+  --card-edge: rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  /* No dark mode specified in brief. Keep light mode as default, Apple-style. */
+  --background: 40 23% 93%;
+  --foreground: 0 0% 7%;
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 60%;
+  --border: 0 0% 85%;
+  --accent: 9 74% 56%;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+  
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: var(--font-serif);
+  }
+}
+
+@layer utilities {
+  /* Dissolves the foot of the card fan into the bone background so the
+     composition never ends on a hard rectangular edge. The stop sits below the
+     centred card's tab panel so its text stays fully opaque. */
+  .mask-bottom-fade {
+    mask-image: linear-gradient(to bottom, black 0, black 78%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0, black 78%, transparent 100%);
+  }
+}
+
+@layer components {
+  /* ---- Fan carousel card -------------------------------------------------
+     The outer .fan-card is positioned and transformed imperatively from
+     requestAnimationFrame (position, depth, rotation, scale, opacity, blur).
+     Everything below is the card's own resting/hover/expanded choreography,
+     kept in CSS so it transitions independently of the fan motion. */
+
+  .fan-card {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    translate: -50% -50%;
+    transform-style: preserve-3d;
+    will-change: transform, opacity, filter;
+    cursor: pointer;
+    outline: none;
+    border-radius: 22px;
+  }
+
+  /* Full-card activation target. Sits above the image window but below the
+     tab panel, so the panel's links remain clickable siblings rather than
+     descendants of a button. */
+  .fan-card__control {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    border-radius: inherit;
+  }
+
+  /* Inset so the ring is not clipped by the shell's overflow. */
+  .fan-card__control:focus-visible {
+    outline: 2px solid hsl(var(--accent));
+    outline-offset: -3px;
+  }
+
+  .fan-card__link {
+    pointer-events: auto;
+    outline: none;
+  }
+
+  .fan-card__link:focus-visible {
+    outline: 2px solid hsl(var(--accent));
+    outline-offset: 2px;
+  }
+
+  .fan-card__shell {
+    position: relative;
+    width: 264px;
+    height: 352px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #fdfdfc;
+    border: 1px solid var(--card-edge);
+    box-shadow:
+      0 24px 48px -22px rgba(17, 17, 17, 0.3),
+      0 2px 6px rgba(17, 17, 17, 0.04);
+    transform: translateY(0) translateZ(0) scale(1);
+    transition:
+      transform 620ms cubic-bezier(0.22, 0.85, 0.24, 1),
+      box-shadow 620ms cubic-bezier(0.22, 0.85, 0.24, 1);
+  }
+
+  .fan-card.is-expanded .fan-card__shell {
+    transform: translateY(-22px) translateZ(60px) scale(1.04);
+    box-shadow:
+      0 44px 72px -28px rgba(17, 17, 17, 0.34),
+      0 4px 10px rgba(17, 17, 17, 0.05);
+  }
+
+  /* Reduced upper image window — the screenshot never sits behind the whole
+     card. Crop is anchored left/top at every size. */
+  .fan-card__window {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 58%;
+    overflow: hidden;
+    background: #f4f2ee;
+  }
+
+  .fan-card__window img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top;
+    display: block;
+  }
+
+  /* The lower tab panel overlaps the image window and rests low, with its
+     foot clipped by the card. Hover/focus/expansion slides it up, which reads
+     as the panel growing taller without animating layout. */
+  .fan-card__panel {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 46%;
+    z-index: 2;
+    /* Visual surface only — clicks fall through to the activation control
+       beneath it. The links opt back in via .fan-card__link. */
+    pointer-events: none;
+    border-radius: 18px 18px 22px 22px;
+    transform: translateY(8%);
+    transition: transform 620ms cubic-bezier(0.22, 0.85, 0.24, 1);
+  }
+
+  .fan-card:hover .fan-card__panel,
+  .fan-card:focus-within .fan-card__panel,
+  .fan-card.is-expanded .fan-card__panel {
+    transform: translateY(0);
+  }
+
+  /* Small protruding tab at the panel's top-left, carrying the app number. */
+  .fan-card__tab {
+    position: absolute;
+    top: -28px;
+    left: 20px;
+    height: 28px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    border-radius: 10px 10px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fan-card__body {
+    height: 100%;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fan-card__desc {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 520ms cubic-bezier(0.22, 0.85, 0.24, 1) 90ms,
+      transform 520ms cubic-bezier(0.22, 0.85, 0.24, 1) 90ms;
+  }
+
+  .fan-card:hover .fan-card__desc,
+  .fan-card:focus-within .fan-card__desc,
+  .fan-card.is-expanded .fan-card__desc {
+    opacity: 0.82;
+    transform: translateY(0);
+  }
+
+  .fan-card__arrow {
+    transition: transform 420ms cubic-bezier(0.22, 0.85, 0.24, 1);
+  }
+
+  .fan-card:hover .fan-card__arrow,
+  .fan-card:focus-within .fan-card__arrow,
+  .fan-card.is-expanded .fan-card__arrow {
+    transform: translate(3px, -3px);
+  }
+
+  @media (max-width: 767px) {
+    .fan-card__shell {
+      width: 204px;
+      height: 272px;
+      border-radius: 18px;
+    }
+
+    .fan-card__tab {
+      top: -24px;
+      height: 24px;
+      padding: 0 10px;
+      font-size: 13px;
+    }
+
+    /* Mobile trades image height for panel height so the number, title,
+       description and Open app link all stay visible and tappable. */
+    .fan-card__window {
+      height: 52%;
+    }
+
+    .fan-card__panel {
+      height: 52%;
+      transform: translateY(6%);
+    }
+
+    .fan-card__body {
+      padding: 13px 15px;
+    }
+  }
+
+  /* A static, readable arrangement: no depth cues that depend on motion. */
+  @media (prefers-reduced-motion: reduce) {
+    .fan-card__panel,
+    .fan-card__desc {
+      transform: none;
+    }
+
+    .fan-card__desc {
+      opacity: 0.82;
+    }
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Seventeen Apps"
+description = "A static single-page brochure showcase for Ruth Heasman's seventeen BSV-focused apps. A calm, Apple-restraint portfolio page with a 3D fan carousel of app cards followed by a generous panel per app, each linking out to the live app."
+version = "1.0.0"
+id = "artifacts/seventeen-apps"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20548
+
+[services.development]
+run = "pnpm --filter @workspace/seventeen-apps run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/seventeen-apps", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/seventeen-apps/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20548"
+BASE_PATH = "/"
