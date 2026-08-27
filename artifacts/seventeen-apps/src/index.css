@@ -50,8 +50,12 @@
      composition never ends on a hard rectangular edge. The stop sits below the
      centred card's tab panel so its text stays fully opaque. */
   .mask-bottom-fade {
-    mask-image: linear-gradient(to bottom, black 0, black 78%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 0, black 78%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0, black 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0, black 88%, transparent 100%);
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
   }
 }
 
@@ -64,7 +68,7 @@
 
   .fan-card {
     position: absolute;
-    top: 40%;
+    top: 45%;
     left: 50%;
     translate: -50% -50%;
     transform-style: preserve-3d;
@@ -107,8 +111,8 @@
 
   .fan-card__shell {
     position: relative;
-    width: 264px;
-    height: 352px;
+    width: 252px;
+    height: 392px;
     border-radius: 22px;
     overflow: hidden;
     background: #fdfdfc;
@@ -153,13 +157,13 @@
   .fan-card__panel {
     position: absolute;
     inset: auto 0 0 0;
-    height: 46%;
+    height: 58%;
     z-index: 2;
     /* Visual surface only — clicks fall through to the activation control
        beneath it. The links opt back in via .fan-card__link. */
     pointer-events: none;
     border-radius: 18px 18px 22px 22px;
-    transform: translateY(8%);
+    transform: translateY(26%);
     transition: transform 620ms cubic-bezier(0.22, 0.85, 0.24, 1);
   }
 
@@ -169,25 +173,19 @@
     transform: translateY(0);
   }
 
-  /* Small protruding tab at the panel's top-left, carrying the app number. */
-  .fan-card__tab {
-    position: absolute;
-    top: -28px;
-    left: 20px;
-    height: 28px;
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    border-radius: 10px 10px 0 0;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+  /* The index number is the panel's anchor: large, light, top-left, with the
+     title falling to the foot of the panel and open space between them. */
+  .fan-card__number {
+    font-size: 40px;
+    line-height: 1;
+    font-weight: 400;
+    letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
   }
 
   .fan-card__body {
     height: 100%;
-    padding: 16px 20px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
   }
@@ -218,32 +216,33 @@
   }
 
   @media (max-width: 767px) {
+    /* The fan sits lower and the cards run larger on phones, so the focused
+       card stays the centre of the composition and its tab stays tappable. */
+    .fan-card {
+      top: 48%;
+    }
+
     .fan-card__shell {
-      width: 204px;
-      height: 272px;
+      width: 224px;
+      height: 348px;
       border-radius: 18px;
     }
 
-    .fan-card__tab {
-      top: -24px;
-      height: 24px;
-      padding: 0 10px;
-      font-size: 13px;
+    .fan-card__number {
+      font-size: 34px;
     }
 
-    /* Mobile trades image height for panel height so the number, title,
-       description and Open app link all stay visible and tappable. */
     .fan-card__window {
-      height: 52%;
+      height: 58%;
     }
 
     .fan-card__panel {
-      height: 52%;
-      transform: translateY(6%);
+      height: 58%;
+      transform: translateY(27%);
     }
 
     .fan-card__body {
-      padding: 13px 15px;
+      padding: 14px;
     }
   }
 

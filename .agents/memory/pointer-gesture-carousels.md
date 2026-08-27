@@ -39,6 +39,23 @@ perspective.
 card that relies on inner `translateZ` (usually the centred/expanded one), or
 apply the blur to a wrapper that has no 3D descendants.
 
+## A CSS mask turns a zero-height container into an invisible one
+
+`h-full` (i.e. `height: 100%`) on the child of a flex item resolves against a
+parent whose height came from `flex-grow`, which is not always a definite
+height — so the child collapses to zero.
+
+**Why:** a masked container that collapses does not merely shrink, it vanishes
+completely, because `mask-size: 100% 100%` of a zero-height box makes every
+pixel transparent. Absolutely-positioned children disappear with it, so the
+symptom is "my whole fan rendered nothing" with no layout clue and no console
+error.
+
+**How to apply:** when a masked box must fill a flex item, position it
+`absolute; inset: 0` inside a `relative` flex item rather than relying on a
+percentage height. Sizing the fan container this way also lets the bottom fade
+land on the viewport edge instead of an arbitrary fixed box.
+
 ## Card-level activation control plus links inside the card
 
 Putting anchors inside an element with `role="button"` is nested interactive

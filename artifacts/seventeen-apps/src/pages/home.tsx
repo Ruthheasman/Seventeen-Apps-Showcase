@@ -7,31 +7,37 @@ export default function Home() {
     <div className="w-full bg-background min-h-[100dvh] overflow-x-hidden selection:bg-accent/20">
       
       {/* Section 1 - Hero & Carousel */}
-      <section className="relative w-full min-h-[100dvh] flex flex-col pt-7 pb-6 md:pt-9">
+      <section className="relative w-full min-h-[100dvh] flex flex-col pt-7 md:pt-9 overflow-hidden">
         
         {/* Header */}
-        <header className="px-6 md:px-12 flex justify-between items-center text-[11px] md:text-xs font-sans font-medium text-foreground tracking-[0.14em] uppercase">
+        <header className="relative z-20 px-6 md:px-12 flex justify-between items-center text-[11px] md:text-xs font-sans font-medium text-foreground tracking-[0.14em] uppercase">
           <span>Ruth Heasman</span>
           <span className="text-muted-foreground">Seventeen apps</span>
         </header>
 
-        {/* Hero Title */}
-        <div className="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 pointer-events-none">
-          <h1 className="font-serif font-medium tracking-tight m-0">
-            <span className="block text-foreground text-2xl md:text-3xl lg:text-4xl leading-none">
+        {/* Hero title. Sits above the fan in z-order so the cards can rise
+            behind the type rather than being pushed below it. */}
+        <div className="relative z-10 shrink-0 mt-[7vh] md:mt-[9vh] flex flex-col items-center text-center px-4 pointer-events-none">
+          <h1 className="font-serif font-medium tracking-[-0.02em] leading-[0.88] m-0">
+            {/* Sized in vw above the mobile breakpoint so line two always
+                holds on a single line, matching its width to the fan below. */}
+            <span className="block text-foreground text-[2.25rem] md:text-[7.9vw]">
               Seventeen apps.
             </span>
-            <span className="block text-muted-foreground text-[2.75rem] leading-[1.05] md:text-7xl lg:text-8xl mt-2 md:mt-3">
+            <span className="block text-muted-foreground text-[2.5rem] md:text-[7.7vw]">
               Every one takes satoshis.
             </span>
           </h1>
-          <p className="mt-7 md:mt-9 font-sans text-muted-foreground text-[11px] md:text-xs tracking-[0.16em] uppercase">
+          <p className="mt-6 md:mt-8 font-sans text-muted-foreground text-[13px] md:text-[15px]">
             Drag, scroll, or use the arrow keys.
           </p>
         </div>
 
-        {/* Carousel */}
-        <Carousel />
+        {/* The fan claims whatever height is left, so it always dissolves into
+            the foot of the viewport rather than against a fixed box. */}
+        <div className="relative z-0 flex-1 min-h-[380px] md:min-h-[440px] -mt-[3vh]">
+          <Carousel />
+        </div>
         
       </section>
 

@@ -31,8 +31,8 @@ interface FanGeometry {
 
 function geometryFor(width: number): FanGeometry {
   return width < 768
-    ? { xStep: 66, yCurve: 2.4, rotation: 2, zStep: 26, scaleDecay: 0.016 }
-    : { xStep: 130, yCurve: 3.2, rotation: 2.4, zStep: 40, scaleDecay: 0.012 };
+    ? { xStep: 68, yCurve: 2.4, rotation: 2, zStep: 26, scaleDecay: 0.016 }
+    : { xStep: 108, yCurve: 3.2, rotation: 2.4, zStep: 40, scaleDecay: 0.012 };
 }
 
 /**
@@ -298,7 +298,7 @@ export function Carousel() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[46vh] min-h-[330px] md:h-[58vh] md:min-h-[430px] touch-pan-y outline-none mask-bottom-fade"
+      className="absolute inset-0 touch-pan-y outline-none mask-bottom-fade"
       style={{ perspective: '1200px' }}
       role="group"
       aria-roledescription="carousel"
@@ -349,34 +349,26 @@ export function Carousel() {
                 className="fan-card__panel"
                 style={{ backgroundColor: theme.bg, color: theme.fg }}
               >
-                <div
-                  className="fan-card__tab"
-                  style={{ backgroundColor: theme.bg, color: theme.fg }}
-                  aria-hidden="true"
-                >
-                  {String(app.number).padStart(2, '0')}
-                </div>
-
                 <div className="fan-card__body">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="font-sans text-[17px] md:text-lg font-semibold tracking-tight leading-tight m-0">
-                      {app.name}
-                    </h3>
+                    <span className="fan-card__number" aria-hidden="true">
+                      {String(app.number).padStart(2, '0')}
+                    </span>
                     <a
                       href={app.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="fan-card__arrow fan-card__link shrink-0 rounded-sm"
+                      className="fan-card__arrow fan-card__link shrink-0 mt-1 rounded-sm"
                       style={{ color: theme.quiet }}
                       aria-label={`Open ${app.name} in a new tab`}
                     >
                       <svg
-                        width="15"
-                        height="15"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2.25"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         aria-hidden="true"
@@ -387,16 +379,23 @@ export function Carousel() {
                     </a>
                   </div>
 
+                  {/* Title and link fall to the foot of the resting panel; the
+                      description sits below the clip line and only comes into
+                      view as the panel slides up. */}
+                  <h3 className="mt-auto font-sans text-[17px] md:text-lg font-semibold tracking-tight leading-tight m-0">
+                    {app.name}
+                  </h3>
+
                   <a
                     href={app.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="fan-card__link mt-1.5 w-fit font-sans text-[13px] leading-none text-accent hover:underline underline-offset-4 rounded-sm"
+                    className="fan-card__link mt-2 w-fit font-sans text-[13px] leading-none text-accent hover:underline underline-offset-4 rounded-sm"
                   >
                     Open app
                   </a>
 
-                  <p className="fan-card__desc mt-3 font-sans text-[13px] leading-snug">
+                  <p className="fan-card__desc mt-2.5 font-sans text-[13px] leading-snug">
                     {app.description}
                   </p>
                 </div>
