@@ -140,7 +140,7 @@ export const apps: ShowcaseApp[] = [
   {
     number: 18,
     name: 'Blockspace',
-    description: 'A territory assembly protocol',
+    description: "An 80s Styx clone that mimics Teranode's block building",
     url: 'https://blockspace-ruthheasman.replit.app',
     image: 'apps/blockspace.webp',
   },
