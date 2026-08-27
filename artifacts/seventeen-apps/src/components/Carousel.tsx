@@ -302,7 +302,7 @@ export function Carousel() {
       style={{ perspective: '1200px' }}
       role="group"
       aria-roledescription="carousel"
-      aria-label="Seventeen apps"
+      aria-label="Eighteen apps"
       tabIndex={0}
       onKeyDown={handleKeyDown}
       onPointerDown={handlePointerDown}
@@ -379,25 +379,28 @@ export function Carousel() {
                     </a>
                   </div>
 
-                  {/* Title and link fall to the foot of the resting panel; the
-                      description sits below the clip line and only comes into
-                      view as the panel slides up. */}
-                  <h3 className="mt-auto font-sans text-[17px] md:text-lg font-semibold tracking-tight leading-tight m-0">
+                  {/* Reads before the description, but CSS `order` drops it to
+                      the foot of the panel. */}
+                  <h3 className="fan-card__title font-sans text-[17px] md:text-lg font-semibold tracking-tight leading-tight m-0">
                     {app.name}
                   </h3>
 
-                  <a
-                    href={app.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="fan-card__link mt-2 w-fit font-sans text-[13px] leading-none text-accent hover:underline underline-offset-4 rounded-sm"
-                  >
-                    Open app
-                  </a>
+                  {/* Holds its space at rest and fades in on hover, focus or
+                      expansion, so the title never shifts. */}
+                  <div className="fan-card__reveal">
+                    <p className="fan-card__desc font-sans leading-snug">
+                      {app.description}
+                    </p>
 
-                  <p className="fan-card__desc mt-2.5 font-sans text-[13px] leading-snug">
-                    {app.description}
-                  </p>
+                    <a
+                      href={app.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="fan-card__link mt-2 font-sans text-[13px] leading-none text-accent hover:underline underline-offset-4 rounded-sm"
+                    >
+                      Open app
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

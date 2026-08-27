@@ -11,7 +11,7 @@
   --color-accent: hsl(var(--accent));
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
 }
 
 :root {
@@ -112,7 +112,7 @@
   .fan-card__shell {
     position: relative;
     width: 252px;
-    height: 392px;
+    height: 340px;
     border-radius: 22px;
     overflow: hidden;
     background: #fdfdfc;
@@ -133,13 +133,17 @@
       0 4px 10px rgba(17, 17, 17, 0.05);
   }
 
-  /* Reduced upper image window — the screenshot never sits behind the whole
-     card. Crop is anchored left/top at every size. */
+  /* The preview rectangle is inset from the top, left and right so it reads as
+     its own framed element rather than something sliced by the card edge. Its
+     depth is fixed to the shallowest capture in the set (1.90:1), so every
+     screenshot fits to the full width of the rectangle; the deeper ones give
+     up a sliver at the foot rather than being cropped in from the sides. */
   .fan-card__window {
     position: absolute;
-    inset: 0 0 auto 0;
-    height: 58%;
+    inset: 10px 10px auto 10px;
+    aspect-ratio: 1.9;
     overflow: hidden;
+    border-radius: 12px;
     background: #f4f2ee;
   }
 
@@ -149,28 +153,43 @@
     object-fit: cover;
     object-position: left top;
     display: block;
+    /* Belt and braces with the window's own overflow clip: some engines will
+       not clip a composited image against an ancestor's rounded corners. */
+    border-radius: inherit;
   }
 
-  /* The lower tab panel overlaps the image window and rests low, with its
-     foot clipped by the card. Hover/focus/expansion slides it up, which reads
-     as the panel growing taller without animating layout. */
+  /* The tab is stepped. Its main body clears the foot of the preview
+     rectangle entirely, so the whole screenshot and the card padding beneath
+     it stay visible; only the raised left step carrying the index number rides
+     up over the image. Fixed height — now that the rectangle is just as deep
+     as the shallowest screenshot, a tab that grew upwards would swallow the
+     image whole, so the reveal happens inside the space the tab already
+     holds. */
   .fan-card__panel {
+    /* One source of truth: the step's height and the matching lift applied to
+       the index number, which must stay exactly equal. */
+    --fan-step: 40px;
     position: absolute;
     inset: auto 0 0 0;
-    height: 58%;
+    height: 57%;
     z-index: 2;
     /* Visual surface only — clicks fall through to the activation control
        beneath it. The links opt back in via .fan-card__link. */
     pointer-events: none;
-    border-radius: 18px 18px 22px 22px;
-    transform: translateY(26%);
-    transition: transform 620ms cubic-bezier(0.22, 0.85, 0.24, 1);
+    border-radius: 0 18px 22px 0;
   }
 
-  .fan-card:hover .fan-card__panel,
-  .fan-card:focus-within .fan-card__panel,
-  .fan-card.is-expanded .fan-card__panel {
-    transform: translateY(0);
+  /* The raised step. Inherits the tab's per-card background so the two read as
+     one shape, and carries the only rounded corner on the step's outer edge. */
+  .fan-card__panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 100%;
+    width: 88px;
+    height: var(--fan-step);
+    background: inherit;
+    border-radius: 0 10px 0 0;
   }
 
   /* The index number is the panel's anchor: large, light, top-left, with the
@@ -181,6 +200,11 @@
     font-weight: 400;
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
+    /* Lifted out of the tab body and into the raised step, which sits exactly
+       this far above the tab's top edge. Positioned so it paints above the
+       step's pseudo-element, which would otherwise cover it. */
+    position: relative;
+    margin-top: calc(-1 * var(--fan-step));
   }
 
   .fan-card__body {
@@ -190,7 +214,20 @@
     flex-direction: column;
   }
 
-  .fan-card__desc {
+  /* Ordered rather than reordered in the DOM: the title reads before its
+     description for assistive tech, but sits at the foot of the panel with the
+     reveal content above it. The reveal holds its space permanently, so the
+     title never moves when it fades in. */
+  .fan-card__reveal {
+    order: 1;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* The container itself never takes clicks: it covers most of the tab, and
+       swallowing them here would stop a click on the tab from collapsing the
+       card. Only the link inside opts in, and only once revealed. */
+    pointer-events: none;
     opacity: 0;
     transform: translateY(8px);
     transition:
@@ -198,11 +235,37 @@
       transform 520ms cubic-bezier(0.22, 0.85, 0.24, 1) 90ms;
   }
 
-  .fan-card:hover .fan-card__desc,
-  .fan-card:focus-within .fan-card__desc,
-  .fan-card.is-expanded .fan-card__desc {
-    opacity: 0.82;
+  .fan-card__title {
+    order: 2;
+  }
+
+  /* Overrides the blanket .fan-card__link rule: a link that cannot be seen
+     must not be clickable, or a tap on the resting tab opens the app instead
+     of expanding the card. Keyboard focus is unaffected by pointer-events. */
+  .fan-card__reveal .fan-card__link {
+    pointer-events: none;
+  }
+
+  .fan-card:hover .fan-card__reveal,
+  .fan-card:focus-within .fan-card__reveal,
+  .fan-card.is-expanded .fan-card__reveal {
+    opacity: 1;
     transform: translateY(0);
+  }
+
+  .fan-card:hover .fan-card__reveal .fan-card__link,
+  .fan-card:focus-within .fan-card__reveal .fan-card__link,
+  .fan-card.is-expanded .fan-card__reveal .fan-card__link {
+    pointer-events: auto;
+  }
+
+  .fan-card__desc {
+    font-size: 12px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    opacity: 0.82;
   }
 
   .fan-card__arrow {
@@ -224,7 +287,7 @@
 
     .fan-card__shell {
       width: 224px;
-      height: 348px;
+      height: 298px;
       border-radius: 18px;
     }
 
@@ -233,12 +296,16 @@
     }
 
     .fan-card__window {
-      height: 58%;
+      inset: 8px 8px auto 8px;
+      border-radius: 10px;
     }
 
     .fan-card__panel {
-      height: 58%;
-      transform: translateY(27%);
+      height: 57%;
+    }
+
+    .fan-card__panel::before {
+      width: 75px;
     }
 
     .fan-card__body {
@@ -246,15 +313,19 @@
     }
   }
 
-  /* A static, readable arrangement: no depth cues that depend on motion. */
+  /* A static, readable arrangement: no depth cues that depend on motion, and
+     the reveal content simply present rather than faded in. */
   @media (prefers-reduced-motion: reduce) {
-    .fan-card__panel,
-    .fan-card__desc {
+    .fan-card__reveal {
       transform: none;
+      opacity: 1;
     }
 
-    .fan-card__desc {
-      opacity: 0.82;
+    /* The reveal is permanently visible here, so its link must be permanently
+       clickable too — otherwise a visible link silently expands the card
+       instead of opening the app. */
+    .fan-card__reveal .fan-card__link {
+      pointer-events: auto;
     }
   }
 }

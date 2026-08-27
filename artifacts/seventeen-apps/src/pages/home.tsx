@@ -12,7 +12,7 @@ export default function Home() {
         {/* Header */}
         <header className="relative z-20 px-6 md:px-12 flex justify-between items-center text-[11px] md:text-xs font-sans font-medium text-foreground tracking-[0.14em] uppercase">
           <span>Ruth Heasman</span>
-          <span className="text-muted-foreground">Seventeen apps</span>
+          <span className="text-muted-foreground">Eighteen apps</span>
         </header>
 
         {/* Hero title. Sits above the fan in z-order so the cards can rise
@@ -22,7 +22,7 @@ export default function Home() {
             {/* Sized in vw above the mobile breakpoint so line two always
                 holds on a single line, matching its width to the fan below. */}
             <span className="block text-foreground text-[2.25rem] md:text-[7.9vw]">
-              Seventeen apps.
+              Eighteen apps.
             </span>
             <span className="block text-muted-foreground text-[2.5rem] md:text-[7.7vw]">
               Every one takes satoshis.

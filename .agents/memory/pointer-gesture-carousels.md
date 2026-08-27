@@ -56,6 +56,35 @@ error.
 percentage height. Sizing the fan container this way also lets the bottom fade
 land on the viewport edge instead of an arbitrary fixed box.
 
+## A fading overlay inside the card must not take pointer events
+
+Once the card carries a reveal block (description + link) that fades in over
+most of the tab, giving that *container* `pointer-events: auto` while it is
+visible silently breaks click-to-collapse: the container, not the underlying
+activation button, receives the click.
+
+**Why:** the reveal covers the middle of the card, which is exactly where a
+user (and any test harness clicking an element's centre) clicks to toggle it.
+The card looks interactive and expands fine — only collapsing fails, which
+reads like a state bug rather than a hit-testing one.
+
+**How to apply:** keep `pointer-events: none` on the reveal container
+permanently and grant `auto` only to the link inside it, gated on the revealed
+state. Gate it: a link that is invisible but clickable will fire instead of
+expanding on touch, where there is no hover to reveal it first. Remember a
+child's `pointer-events: auto` overrides an ancestor's `none`, so a blanket
+link rule needs an explicit resting override to stay inert.
+
+## Absolutely-positioned pseudo-elements paint over static siblings
+
+A decorative `::before` (e.g. a raised tab step drawn behind a number) paints
+*above* the element's static in-flow content, because positioned boxes paint
+after non-positioned ones in the same stacking context — no z-index involved.
+
+**How to apply:** give the content that must sit on top `position: relative`.
+It then paints in tree order after the pseudo-element. Reaching for a negative
+z-index instead usually pushes the decoration behind the card background too.
+
 ## Card-level activation control plus links inside the card
 
 Putting anchors inside an element with `role="button"` is nested interactive
